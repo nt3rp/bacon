@@ -1,20 +1,44 @@
 import os
 import json
+from models import Session, Film, get_or_create, Actor
 
-DATABASE_URI = 'http://localhost:7474/db/data/'
 DIRECTORY = 'films'
 
-# Iterate over all files in a folder
-for filename in os.listdir(DIRECTORY):
-    contents = None
+def import_data(*args, **kwargs):
+    session = Session()
 
-    full_path = os.path.join(DIRECTORY, filename)
-    print full_path
+    # Iterate over all files in a folder
+    for filename in os.listdir(DIRECTORY):
+        contents = None
 
-    with open(full_path) as f:
-        contents = json.loads(f.read())
+        full_path = os.path.join(DIRECTORY, filename)
 
-    if not contents:
-        continue
+        with open(full_path) as f:
+            contents = json.loads(f.read())
 
-    # For each file, create necessary nodes
+        if not contents:
+            continue
+
+        title = contents.get('film', {}).get('name')
+
+        if not title:
+            continue
+
+        film, _ = get_or_create(session, Film, name=title)
+        session.add(film)
+        session.commit()
+
+        actors = []
+        for cast_member in contents.get('cast'):
+            name = cast_member.get('name')
+
+            actor, _ = get_or_create(session, Actor, name=name)
+            actors.append(actor)
+
+        session.add_all(actors)
+        session.commit()
+
+        film.actors = actors;
+        session.add(film)
+
+        session.commit()

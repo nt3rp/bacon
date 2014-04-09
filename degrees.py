@@ -1,4 +1,5 @@
 import argparse
+import importer
 import models
 
 def main():
@@ -12,6 +13,11 @@ def main():
         'initialize', help='Initializes the application'
     )
     create_parser.set_defaults(func=models.create_database)
+
+    import_parser = subparsers.add_parser(
+        'import', help='Imports data from films folder'
+    )
+    import_parser.set_defaults(func=importer.import_data)
 
     args, unknown = parser.parse_known_args()
 
