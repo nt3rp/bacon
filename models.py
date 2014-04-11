@@ -20,6 +20,13 @@ class Actor(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
+    def __repr__(self):
+        return "<Actor(name='{}')>".format(self.name)
+
+    # Basically, just an alias to make our breadth-first search more generic
+    def relations(self):
+        return self.films
+
 
 class Film(Base):
     __tablename__ = 'films'
@@ -28,6 +35,13 @@ class Film(Base):
     name = Column(String)
 
     actors = relationship('Actor', secondary=film_relations, backref='films')
+
+    def __repr__(self):
+        return "<Film(name='{}')>".format(self.name)
+
+    # Basically, just an alias to make our breadth-first search more generic
+    def relations(self):
+        return self.actors
 
 # TODO: Pass in 'echo' options somehow
 # TODO: Check if DB exists before creating
@@ -45,3 +59,33 @@ def get_or_create(session, model, defaults=None, **kwargs):
         instance = model(**params)
         session.add(instance)
         return instance, True
+
+def find(name, target_name="Kevin Bacon", **kwargs):
+    session = Session()
+
+    # Basically, do a breadth-first search
+
+    # Find actor
+    actor = session.query(Actor).filter(Actor.name == name).first()
+
+    # TODO: If not actor...
+    path = breadth_first_search(actor)
+    print path
+
+def breadth_first_search(actor, target_name='Kevin Bacon'):
+    queue = []
+    queue.append([actor])
+
+    while queue:
+        # Equivalent to 'dequeue'
+        path = queue.pop(0)
+
+        node = path[-1]
+
+        if node.name == target_name:
+            return path
+
+        for adjacent in node.relations():
+            new_path = list(path)
+            new_path.append(adjacent)
+            queue.append(new_path)

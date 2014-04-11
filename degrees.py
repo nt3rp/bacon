@@ -19,9 +19,15 @@ def main():
     )
     import_parser.set_defaults(func=importer.import_data)
 
-    args, unknown = parser.parse_known_args()
+    search_parser = subparsers.add_parser(
+        'find', help='Find link from actor to Kevin Bacon'
+    )
+    search_parser.add_argument('name', help='name of actor to start search from')
+    search_parser.set_defaults(func=models.find)
 
-    args.func(args)
+    args, unknown = parser.parse_known_args()
+    kwargs = vars(args)
+    args.func(**kwargs)
 
 if __name__ == '__main__':
     main()
