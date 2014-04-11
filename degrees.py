@@ -22,7 +22,7 @@ def main():
     search_parser = subparsers.add_parser(
         'find', help='Find link from actor to Kevin Bacon'
     )
-    search_parser.add_argument('name', help='name of actor to start search from')
+    search_parser.add_argument('actor_name', help='name of actor to start search from')
     search_parser.set_defaults(func=models.find)
 
     args, unknown = parser.parse_known_args()

@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.sql import ClauseElement
 
-db = create_engine('sqlite:///six_degrees.db', echo=True)
+db = create_engine('sqlite:///six_degrees.db')
 
 Session = sessionmaker(bind=db)
 Base = declarative_base()
@@ -60,17 +60,24 @@ def get_or_create(session, model, defaults=None, **kwargs):
         session.add(instance)
         return instance, True
 
-def find(name, target_name="Kevin Bacon", **kwargs):
+def find(actor_name, target_name="Kevin Bacon", **kwargs):
     session = Session()
 
     # Basically, do a breadth-first search
 
     # Find actor
-    actor = session.query(Actor).filter(Actor.name == name).first()
+    actor = session.query(Actor).filter(Actor.name == actor_name).first()
 
     # TODO: If not actor...
     path = breadth_first_search(actor)
-    print path
+
+    for index, item in enumerate(path):
+        if (index % 2) == 1:
+            path[index] = '-({})->'.format(item.name)
+        else:
+            path[index] = '{}'.format(item.name)
+
+    print ' '.join(path)
 
 def breadth_first_search(actor, target_name='Kevin Bacon'):
     queue = []
