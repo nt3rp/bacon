@@ -1,14 +1,10 @@
-from sqlalchemy import Column, Integer, String, create_engine, Table, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy import Column, Integer, String, Table, ForeignKey
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import ClauseElement
 
-db = create_engine('sqlite:///six_degrees.db')
-
-Session = sessionmaker(bind=db)
-Base = declarative_base()
-
 # Our relations table
+from bacon import Base, Session
+
 film_relations = Table('film_relations', Base.metadata,
     Column('film_id', Integer, ForeignKey('films.id')),
     Column('actor_id', Integer, ForeignKey('actors.id'))
@@ -45,7 +41,7 @@ class Film(Base):
 
 # TODO: Pass in 'echo' options somehow
 # TODO: Check if DB exists before creating
-def create_database(*args, **kwargs):
+def create_database(db, *args, **kwargs):
     Base.metadata.create_all(db)
 
 # http://stackoverflow.com/a/2587041/165988

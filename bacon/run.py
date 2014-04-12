@@ -1,6 +1,7 @@
 import argparse
-from bacon import importer
-from bacon import models
+from sqlalchemy import create_engine
+from bacon import importer, models, Session
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -27,6 +28,11 @@ def main():
 
     args, unknown = parser.parse_known_args()
     kwargs = vars(args)
+
+    db = create_engine('sqlite:///six_degrees.db')
+    Session.configure(bind=db)
+    kwargs['db'] = db
+
     args.func(**kwargs)
 
 if __name__ == '__main__':
