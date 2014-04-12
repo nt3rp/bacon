@@ -1,6 +1,6 @@
 import argparse
-import importer
-import models
+from bacon import importer
+from bacon import models
 
 def main():
     parser = argparse.ArgumentParser(

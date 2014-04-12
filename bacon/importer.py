@@ -1,6 +1,6 @@
 import os
 import json
-from models import Session, Film, get_or_create, Actor
+from bacon.models import Session, Film, get_or_create, Actor
 
 DIRECTORY = 'films'
 
