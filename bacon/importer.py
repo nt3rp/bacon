@@ -1,67 +1,68 @@
 import os
 import json
-import pickle
 from bacon import settings
 
 # TODO: Describe expected format
 # TODO: Suppress output during tests
 
-def import_directory(
-        directory=settings.IMPORT_DIRECTORY,
-        pickling=settings.PICKLING,
-        **kwargs
-    ):
-    # Note that our 'database' could probably just be one dictionary.
-    # However, since its possible that there are movies and actors
-    # that share a name (e.g. "Ed Wood" <- A director, but you get
-    # the idea), we break things up into 'actors' and 'films'.
-    database = {
-        'films': {},
-        'actors': {}
-    }
+class Importer(object):
+    def __init__(self):
+        # Note that our 'database' could probably just be one dictionary.
+        # However, since its possible that there are movies and actors
+        # that share a name (e.g. "Ed Wood" <- A director, but you get
+        # the idea), we break things up into 'actors' and 'films'.
+        self.database = {
+            'films': {},
+            'actors': {}
+        }
 
-    try:
-        files = os.listdir(directory)
-    except:  # We don't particularly care what the exception is. Just handle it.
-        print('There was a problem accessing "{}"'.format(directory))
-        return
+    def load_directory(self, directory):
+        try:
+            files = os.listdir(directory)
+        except:  # We don't particularly care what the exception is. Just handle it.
+            print('There was a problem accessing "{}"'.format(directory))
+            return
 
-    # Iterate over all files in a folder
-    for filename in files:
-        full_path = os.path.join(directory, filename)
-        import_file(full_path, database)
+        # Iterate over all files in a folder
+        for filename in files:
+            path = os.path.join(directory, filename)
+            load_file(path)
 
-    if pickling:
-        pickle.dump(database, open('db.p', 'wb'))
+    def load_file(self, path):
+        with open(path) as f:
+            self.parse_file(f.read())
 
-    return database
+    def parse_file(self, file_contents):
+        try:
+            obj = json.loads(file_contents)
+        except ValueError:
+            # Skip this file. We only handle JSON right now.
+            return
+
+        title = obj.get('film', {}).get('name')
+
+        if not title:
+            return
+
+        if not self.database['films'].get(title):
+            self.database['films'][title] = set()
+
+        for actor in obj.get('cast'):
+            name = actor.get('name')
+
+            if not self.database['actors'].get(name):
+                self.database['actors'][name] = set()
+
+            self.database['actors'][name].add(title)
+            self.database['films'][title].add(name)
 
 
-def import_file(full_path, database, *args, **kwargs):
-    with open(full_path) as f:
-        parse_file(database, f.read())
+def load_directory(directory=settings.IMPORT_DIRECTORY, **kwargs):
+    importer = Importer()
+    importer.load_directory(directory)
+    return importer
 
-
-def parse_file(database, file):
-    try:
-        obj = json.loads(file)
-    except ValueError:
-        # Skip this file. We only handle JSON right now.
-        return
-
-    title = obj.get('film', {}).get('name')
-
-    if not title:
-        return
-
-    if not database['films'].get(title):
-        database['films'][title] = set()
-
-    for actor in obj.get('cast'):
-        name = actor.get('name')
-
-        if not database['actors'].get(name):
-            database['actors'][name] = set()
-
-        database['actors'][name].add(title)
-        database['films'][title].add(name)
+def load_file(path, *args, **kwargs):
+    importer = Importer()
+    importer.load_file(path)
+    return importer

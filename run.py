@@ -19,7 +19,7 @@ def main():
         default=settings.IMPORT_DIRECTORY,
         help='Name of actor to find connection to.'
     )
-    import_parser.set_defaults(func=importer.import_directory)
+    import_parser.set_defaults(func=importer.load_directory)
 
     # Sub-command for search data
     search_parser = subparsers.add_parser(
