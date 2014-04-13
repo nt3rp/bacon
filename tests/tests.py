@@ -116,7 +116,7 @@ class FilmGraphTestCase(unittest.TestCase):
 
     def test_no_films_in_common(self):
         self.datastore.add_link('Superman', 'The Adventures of Lois and Clark')
-        self.datastore.add_link('Clark Kent', 'Superman 2')
+        self.datastore.add_link('Clark Kent', 'Superman')
 
         expected = []
         actual = self.datastore.get_shortest_path('Clark Kent', 'Superman')

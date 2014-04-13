@@ -43,7 +43,8 @@ class FilmGraph(object):
             self._datastore,
             from_actor,
             to_actor,
-            self.neighbours
+            self.neighbours,
+            self.valid_path
         )
 
         return path
@@ -52,3 +53,7 @@ class FilmGraph(object):
     def neighbours(graph, node, level):
         key = 'films' if (is_odd(level)) else 'actors'
         return graph.get(key, {}).get(node, [])
+
+    @staticmethod
+    def valid_path(path):
+        return is_odd(len(path))
