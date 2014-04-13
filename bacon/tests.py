@@ -66,8 +66,35 @@ class ImportTestCase(unittest.TestCase):
         }
         self.assertDictEqual(expected, actual)
 
-    # test duplicate actor
-    # test duplicate film
+    def test_verify_duplicate_actor(self):
+        importer.parse_file(self.db, json.dumps({
+            'film': {'name': 'Film 1'},
+            'cast': [{'name': 'Actor 1'}, {'name': 'Actor 1'}]
+        }))
+
+        actual = self.db
+        expected = {
+            'films': {'Film 1': set(['Actor 1'])},
+            'actors': {'Actor 1': set(['Film 1'])}
+        }
+        self.assertDictEqual(expected, actual)
+
+    def test_verify_duplicate_film(self):
+        importer.parse_file(self.db, json.dumps({
+            'film': {'name': 'Film 1'},
+            'cast': [{'name': 'Actor 1'}]
+        }))
+        importer.parse_file(self.db, json.dumps({
+            'film': {'name': 'Film 1'},
+            'cast': [{'name': 'Actor 1'}]
+        }))
+
+        actual = self.db
+        expected = {
+            'films': {'Film 1': set(['Actor 1'])},
+            'actors': {'Actor 1': set(['Film 1'])}
+        }
+        self.assertDictEqual(expected, actual)
 
 if __name__ == '__main__':
     unittest.main()
