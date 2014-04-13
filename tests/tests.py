@@ -1,5 +1,8 @@
 import unittest
 from bacon import importer
+from bacon.models import FilmGraph
+from bacon.search import find
+
 
 class ImportTestCase(unittest.TestCase):
     def setUp(self):
@@ -83,16 +86,52 @@ class ImportTestCase(unittest.TestCase):
         self.assertDictEqual(expected, actual)
 
 
-class SearchTestCase(unittest.TestCase):
+class FilmGraphTestCase(unittest.TestCase):
     def setUp(self):
-        pass
+        self.datastore = FilmGraph()
 
     def tearDown(self):
         pass
 
-    # No matches found
+    def test_empty_datastore(self):
+        expected = []
+        actual = self.datastore.get_shortest_path('Anyone')
+        self.assertListEqual(expected, actual)
+
+    def test_no_such_actor(self):
+        self.datastore.add_link('John Crichton', 'Farscape')
+
+        expected = []
+        actual = self.datastore.get_shortest_path('Aeryn Sun')
+        self.assertListEqual(expected, actual)
+
+    def test_no_such_target_actor(self):
+        self.datastore.add_link('John Crichton', 'Farscape')
+
+        expected = []
+        actual = self.datastore.get_shortest_path(
+            'John Crichton', 'Future Crichton'
+        )
+        self.assertListEqual(expected, actual)
+
+    def test_no_films_in_common(self):
+        self.datastore.add_link('Superman', 'The Adventures of Lois and Clark')
+        self.datastore.add_link('Clark Kent', 'Superman')
+
+        expected = []
+        actual = self.datastore.get_shortest_path('Clark Kent', 'Superman')
+        self.assertListEqual(expected, actual)
+
+    def test_start_is_finish(self):
+        self.datastore.add_link('Somebody to Love', 'Queen')
+
+        expected = ['Somebody to Love']
+        actual = self.datastore.get_shortest_path(
+            'Somebody to Love', 'Somebody to Love'
+        )
+        self.assertListEqual(expected, actual)
+
     # Verify shortest path
-    # Start = End
 
 if __name__ == '__main__':
     unittest.main()

@@ -28,3 +28,5 @@ def breadth_first_search(graph, start, finish, neighbour_fn=neighbours):
             queue.append(new_path)
 
         level += 1
+
+    return []

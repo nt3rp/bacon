@@ -3,15 +3,18 @@ from bacon.utils import breadth_first_search, is_odd
 
 
 class FilmGraph(object):
-    def __init__(self):
+    def __init__(self, data=None):
         # Note that our 'database' could probably just be one dictionary.
         # However, since its possible that there are movies and actors
         # that share a name (e.g. "Ed Wood" <- A director, but you get
         # the idea), we break things up into 'actors' and 'films'.
-        self._datastore = {
-            'films': {},
-            'actors': {}
-        }
+        if not data:
+            data = {
+                'films': {},
+                'actors': {}
+            }
+
+        self._datastore = data
 
     def to_dict(self):
         return self._datastore
@@ -25,6 +28,12 @@ class FilmGraph(object):
 
         self._datastore['actors'][actor].add(film)
         self._datastore['films'][film].add(actor)
+
+    def find_actor(self, actor):
+        return self._datastore['actors'].get(actor)
+
+    def find_film(self, film):
+        return self._datastore['films'].get(film)
 
     def get_shortest_path(self, from_actor, to_actor=None):
         if not to_actor:
@@ -42,4 +51,4 @@ class FilmGraph(object):
     @staticmethod
     def neighbours(graph, node, level):
         key = 'films' if (is_odd(level)) else 'actors'
-        return graph.to_dict()[key].get(node, [])
+        return graph.get(node, [])

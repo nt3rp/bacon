@@ -19,6 +19,10 @@ class Importer(object):
     def datastore(self):
         return self._datastore.to_dict()
 
+    @datastore.setter
+    def datastore(self, data):
+        self._datastore = FilmGraph(data)
+
     def load_directory(self, directory):
         try:
             files = os.listdir(directory)
@@ -51,13 +55,16 @@ class Importer(object):
             name = actor.get('name')
             self._datastore.add_link(name, title)
 
-    def stash(self):
-        # Store the results of our import
-        pickle.dump(self.datastore, open(settings.STASH_FILENAME, 'wb'))
+    def stash(self, filename=None):
+        if not filename:
+            filename = settings.STASH_FILENAME
+        pickle.dump(self.datastore, open(filename, 'wb'))
 
-    # class method?
-    def from_stash(self):
-        raise NotImplementedError
+    def from_stash(self, filename=None):
+        if not filename:
+            filename = settings.STASH_FILENAME
+
+        self.datastore = pickle.load(open(filename, 'rb'))
 
 
 def load_directory(
@@ -79,3 +86,7 @@ def load_file(path, store_result=settings.STASH_IMPORTED, *args, **kwargs):
         importer.stash()
 
     return importer
+
+def load_stash(filename):
+    importer = Importer()
+    return importer.from_stash().datastore()
