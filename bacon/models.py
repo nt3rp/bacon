@@ -1,22 +1,7 @@
 import pickle
-from collections import namedtuple
-from sqlalchemy import Column, Integer, String, Table, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import ClauseElement
-
-# Our relations table
-from bacon import Base, Session
-
-
-# TODO: Pass in 'echo' options somehow
-# TODO: Check if DB exists before creating
-def create_database(db, *args, **kwargs):
-    Base.metadata.create_all(db)
 
 def find(actor_name, target_name="Kevin Bacon", **kwargs):
     database = pickle.load(open('db.p', 'rb'))
-
-    # Basically, do a breadth-first search
 
     # Check if actor exists
     actor = database['actors'].get(actor_name)
@@ -35,7 +20,7 @@ def find(actor_name, target_name="Kevin Bacon", **kwargs):
     print ' '.join(path)
 
 def breadth_first_search(database, actor, target_actor='Kevin Bacon'):
-    queue = []
+    queue = list()
     queue.append([actor])
 
     # Need to alternate between search actors, and searching movies

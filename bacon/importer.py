@@ -1,7 +1,6 @@
 import os
 import json
 import pickle
-from bacon import Session
 
 DIRECTORY = 'films'
 
