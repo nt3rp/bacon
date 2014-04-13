@@ -1,0 +1,8 @@
+{
+    "film": {
+        "name": "Film 1"
+    },
+    "cast": [{
+        "name": "Actor 1"
+    }]
+}
