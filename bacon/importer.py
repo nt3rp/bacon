@@ -8,6 +8,7 @@ from bacon.models import FilmGraph
 # TODO: Suppress output during tests
 
 class Importer(object):
+    """Handles the importing of film data (actors and film titles)."""
     def __init__(self):
         # Note that our 'database' could probably just be one dictionary.
         # However, since its possible that there are movies and actors
@@ -24,9 +25,11 @@ class Importer(object):
         self._datastore = data
 
     def load_directory(self, directory):
+        """Load film files (assumed to be JSON) from `directory`"""
         try:
             files = os.listdir(directory)
-        except:  # We don't particularly care what the exception is. Just handle it.
+        except:
+            # We don't particularly care what the exception is. Just handle it.
             print('There was a problem accessing "{}"'.format(directory))
             return
 
@@ -38,12 +41,14 @@ class Importer(object):
         return self
 
     def load_file(self, path):
+        """Load film a film files (assumed to be JSON) from `path`"""
         with open(path) as f:
             self.parse_file(f.read())
 
         return self
 
     def parse_file(self, file_contents):
+        """Parse the contents of a film file (assumed to be JSON) into our format."""
         try:
             obj = json.loads(file_contents)
         except ValueError:
@@ -62,6 +67,7 @@ class Importer(object):
         return self
 
     def stash(self, filename=None):
+        """Pickle our datastore to stash it for later."""
         if not filename:
             filename = settings.STASH_FILENAME
 
@@ -69,6 +75,7 @@ class Importer(object):
         return self
 
     def from_stash(self, filename=None):
+        """Unpickle our datastore for further importing."""
         if not filename:
             filename = settings.STASH_FILENAME
 

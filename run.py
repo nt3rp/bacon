@@ -3,6 +3,7 @@ from bacon import importer, search, settings
 
 
 def main():
+    """The main runner file for the 'bacon' project."""
     parser = argparse.ArgumentParser(
         description='Find the shortest path between actors.'
     )

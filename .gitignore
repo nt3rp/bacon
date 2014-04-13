@@ -2,3 +2,4 @@ films/*
 *.idea
 *.db
 *.p
+*.coverage
