@@ -1,41 +1,48 @@
 import os
 import json
-from bacon import Session
-from bacon.models import Film, get_or_create, Actor
+import pickle
+from bacon import settings
 
-DIRECTORY = 'films'
 
-def import_data(*args, **kwargs):
-    session = Session()
+def import_data(directory=None, *args, **kwargs):
+    if not directory:
+        directory = settings.IMPORT_DIRECTORY
+
+    # Note that our 'database' could probably just be one dictionary.
+    # However, since its possible that there are movies and actors
+    # that share a name (e.g. "Ed Wood" <- A director, but you get
+    # the idea), we break things up into 'actors' and 'films'.
+    database = {
+        'films': {},
+        'actors': {}
+    }
 
     # Iterate over all files in a folder
-    for filename in os.listdir(DIRECTORY):
-        full_path = os.path.join(DIRECTORY, filename)
+    for filename in os.listdir(directory):
+        full_path = os.path.join(directory, filename)
 
-        contents = None
         with open(full_path) as f:
-            contents = json.loads(f.read())
-
-        if not contents:
-            continue
+            try:
+                contents = json.loads(f.read())
+            except ValueError:
+                continue
 
         title = contents.get('film', {}).get('name')
 
         if not title:
             continue
 
-        film = Film(name=title)
+        if not database['films'].get(title):
+            database['films'][title] = set()
 
-        actors = []
-        for cast_member in contents.get('cast'):
-            name = cast_member.get('name')
 
-            actor = Actor(name=name)
-            actors.append(actor)
+        for actor in contents.get('cast'):
+            name = actor.get('name')
 
-        session.add_all(actors)
+            if not database['actors'].get(name):
+                database['actors'][name] = set()
 
-        film.actors = actors;
-        session.add(film)
+            database['actors'][name].add(title)
+            database['films'][title].add(name)
 
-    session.commit()
+    pickle.dump(database, open('db.p', 'wb'))
