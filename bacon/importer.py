@@ -14,12 +14,11 @@ def import_data(*args, **kwargs):
     for filename in os.listdir(DIRECTORY):
         full_path = os.path.join(DIRECTORY, filename)
 
-        contents = None
         with open(full_path) as f:
-            contents = json.loads(f.read())
-
-        if not contents:
-            continue
+            try:
+                contents = json.loads(f.read())
+            except ValueError:
+                continue
 
         title = contents.get('film', {}).get('name')
 

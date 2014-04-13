@@ -1,15 +1,14 @@
 import pickle
+from bacon.utils import is_odd
 
-def find(actor_name, target_name="Kevin Bacon", **kwargs):
+
+def find(actor, target_actor="Kevin Bacon", **kwargs):
     database = pickle.load(open('db.p', 'rb'))
 
-    # Check if actor exists
-    actor = database['actors'].get(actor_name)
-    if not actor:
+    if not database['actors'].get(actor):
         pass
 
-    # TODO: If not actor...
-    path = breadth_first_search(database, actor_name)
+    path = breadth_first_search(database, actor, target_actor)
 
     for index, item in enumerate(path):
         if (index % 2) == 1:
@@ -19,11 +18,11 @@ def find(actor_name, target_name="Kevin Bacon", **kwargs):
 
     print ' '.join(path)
 
+
 def breadth_first_search(database, actor, target_actor='Kevin Bacon'):
     queue = list()
     queue.append([actor])
 
-    # Need to alternate between search actors, and searching movies
     count = 0
     while queue:
         # Equivalent to 'dequeue'
@@ -34,12 +33,9 @@ def breadth_first_search(database, actor, target_actor='Kevin Bacon'):
         if node == target_actor:
             return path
 
-        if count % 2 == 0:
-            relations = database['actors'].get(node, [])
-        else:
-            relations = database['films'].get(node, [])
+        key = 'films' if (is_odd(count)) else 'actors'
 
-        for adjacent in relations:
+        for adjacent in database[key].get(node, []):
             new_path = list(path)
             new_path.append(adjacent)
             queue.append(new_path)

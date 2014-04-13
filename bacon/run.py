@@ -1,6 +1,5 @@
 import argparse
-from sqlalchemy import create_engine
-from bacon import importer, models, Session
+from bacon import importer, search
 
 
 def main():
@@ -10,29 +9,24 @@ def main():
 
     subparsers = parser.add_subparsers(help='sub-command help')
 
-    create_parser = subparsers.add_parser(
-        'initialize', help='Initializes the application'
-    )
-    create_parser.set_defaults(func=models.create_database)
-
+    # Sub-command for importing initial data
     import_parser = subparsers.add_parser(
         'import', help='Imports data from films folder'
     )
     import_parser.set_defaults(func=importer.import_data)
 
+    # Sub-command for search data
     search_parser = subparsers.add_parser(
         'find', help='Find link from actor to Kevin Bacon'
     )
-    search_parser.add_argument('actor_name', help='name of actor to start search from')
-    search_parser.set_defaults(func=models.find)
+    search_parser.add_argument('actor', help='name of actor to start search from')
+    search_parser.set_defaults(func=search.find)
 
+    # Process Arguments
     args, unknown = parser.parse_known_args()
     kwargs = vars(args)
 
-    db = create_engine('sqlite:///six_degrees.db')
-    Session.configure(bind=db)
-    kwargs['db'] = db
-
+    # Run whichever sub-command is necessary
     args.func(**kwargs)
 
 if __name__ == '__main__':
