@@ -3,6 +3,7 @@ import json
 import pickle
 from bacon import settings
 
+# TODO: Describe expected format
 
 def import_directory(
         directory=settings.IMPORT_DIRECTORY,
