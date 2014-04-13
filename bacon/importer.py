@@ -37,14 +37,15 @@ def import_directory(
 
 def import_file(database, full_path, *args, **kwargs):
     with open(full_path) as f:
-        try:
-            contents = parse_file(database, f.read())
-        except ValueError:
-            return
+        contents = parse_file(database, f.read())
 
 
 def parse_file(database, file):
-    obj = json.loads(file)
+    try:
+        obj = json.loads(file)
+    except ValueError:
+        return
+
     title = obj.get('film', {}).get('name')
 
     if not title:
