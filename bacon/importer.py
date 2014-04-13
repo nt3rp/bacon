@@ -11,7 +11,7 @@ class Importer(object):
         # However, since its possible that there are movies and actors
         # that share a name (e.g. "Ed Wood" <- A director, but you get
         # the idea), we break things up into 'actors' and 'films'.
-        self.database = {
+        self.datastore = {
             'films': {},
             'actors': {}
         }
@@ -44,17 +44,17 @@ class Importer(object):
         if not title:
             return
 
-        if not self.database['films'].get(title):
-            self.database['films'][title] = set()
+        if not self.datastore['films'].get(title):
+            self.datastore['films'][title] = set()
 
         for actor in obj.get('cast'):
             name = actor.get('name')
 
-            if not self.database['actors'].get(name):
-                self.database['actors'][name] = set()
+            if not self.datastore['actors'].get(name):
+                self.datastore['actors'][name] = set()
 
-            self.database['actors'][name].add(title)
-            self.database['films'][title].add(name)
+            self.datastore['actors'][name].add(title)
+            self.datastore['films'][title].add(name)
 
 
 def load_directory(directory=settings.IMPORT_DIRECTORY, **kwargs):
