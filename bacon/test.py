@@ -6,7 +6,7 @@ from bacon.utils import error
 
 class TestImport(unittest.TestCase):
     def setUp(self):
-        pass
+        self.out = StringIO()
 
     def tearDown(self):
         pass
@@ -15,13 +15,12 @@ class TestImport(unittest.TestCase):
         pass
 
     def test_bad_directory(self):
-        out = StringIO()
         directory = 'bad_folder'
-        importer.import_data(directory='bad_folder', out=out)
-        output = out.getvalue().strip()
+        importer.import_data(directory='bad_folder', out=self.out)
 
+        actual = self.out.getvalue().strip()
         expected = error('bad folder', directory=directory)
-        self.assertEqual(expected, output)
+        self.assertEqual(expected, actual)
 
     # No read permissions
 
