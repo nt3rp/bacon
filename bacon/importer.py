@@ -17,8 +17,14 @@ def import_data(directory=None, *args, **kwargs):
         'actors': {}
     }
 
+    try:
+        files = os.listdir(directory)
+    except:
+        print('There was a problem accessing "{}"'.format(directory))
+        return
+
     # Iterate over all files in a folder
-    for filename in os.listdir(directory):
+    for filename in files:
         full_path = os.path.join(directory, filename)
 
         with open(full_path) as f:

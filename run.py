@@ -1,5 +1,6 @@
 import argparse
-from bacon import importer, search
+from bacon import importer, search, settings
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -10,7 +11,13 @@ def main():
 
     # Sub-command for importing initial data
     import_parser = subparsers.add_parser(
-        'import', help='Imports data from films folder'
+        'import', help='Import data from folder'
+    )
+    import_parser.add_argument(
+        'directory',
+        nargs='?',
+        default=settings.IMPORT_DIRECTORY,
+        help='Name of actor to find connection to.'
     )
     import_parser.set_defaults(func=importer.import_data)
 
@@ -24,7 +31,7 @@ def main():
     search_parser.add_argument(
         'target_actor',
         nargs='?',
-        default='Kevin Bacon',
+        default=settings.DEFAULT_TARGET_ACTOR,
         help='Name of actor to find connection to.'
     )
     search_parser.set_defaults(func=search.find)

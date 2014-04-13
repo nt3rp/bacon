@@ -1,1 +1,2 @@
 IMPORT_DIRECTORY = './films'
+DEFAULT_TARGET_ACTOR = 'Kevin Bacon'
