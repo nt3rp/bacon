@@ -1,5 +1,6 @@
 import os
 import json
+import pickle
 from bacon import settings
 from bacon.models import FilmGraph
 
@@ -50,13 +51,30 @@ class Importer(object):
             name = actor.get('name')
             self._datastore.add_link(name, title)
 
+    def stash(self):
+        # Store the results of our import
+        pickle.dump(self.datastore, open(settings.STASH_FILENAME, 'wb'))
 
-def load_directory(directory=settings.IMPORT_DIRECTORY, **kwargs):
+    def from_stash(self):
+        raise NotImplementedError
+
+
+def load_directory(
+        directory=settings.IMPORT_DIRECTORY,
+        store_result=settings.STASH_IMPORTED,
+        **kwargs
+    ):
     importer = Importer()
     importer.load_directory(directory)
+    if store_result:
+        importer.stash()
+
     return importer
 
-def load_file(path, *args, **kwargs):
+def load_file(path, store_result=settings.STASH_IMPORTED, *args, **kwargs):
     importer = Importer()
     importer.load_file(path)
+    if store_result:
+        importer.stash()
+
     return importer
