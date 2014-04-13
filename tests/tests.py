@@ -1,7 +1,6 @@
 import unittest
 from bacon import importer
 from bacon.models import FilmGraph
-from bacon.search import find
 
 
 class ImportTestCase(unittest.TestCase):

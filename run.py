@@ -17,7 +17,7 @@ def main():
         'directory',
         nargs='?',
         default=settings.IMPORT_DIRECTORY,
-        help='Name of actor to find connection to.'
+        help='Directory where film JSON files can be found.'
     )
     import_parser.set_defaults(func=importer.load_directory)
 
