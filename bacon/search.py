@@ -1,7 +1,5 @@
-import pickle
 from bacon import settings
 from bacon.importer import load_stash
-from bacon.utils import is_odd, breadth_first_search
 
 
 def find(actor, target_actor=settings.TARGET_ACTOR, datastore=None, **kwargs):

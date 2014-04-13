@@ -17,11 +17,11 @@ class Importer(object):
 
     @property
     def datastore(self):
-        return self._datastore.to_dict()
+        return self._datastore
 
     @datastore.setter
     def datastore(self, data):
-        self._datastore = FilmGraph(data)
+        self._datastore = data
 
     def load_directory(self, directory):
         try:
@@ -35,36 +35,45 @@ class Importer(object):
             path = os.path.join(directory, filename)
             load_file(path)
 
+        return self
+
     def load_file(self, path):
         with open(path) as f:
             self.parse_file(f.read())
+
+        return self
 
     def parse_file(self, file_contents):
         try:
             obj = json.loads(file_contents)
         except ValueError:
             # Skip this file. We only handle JSON right now.
-            return
+            return self
 
         title = obj.get('film', {}).get('name')
 
         if not title:
-            return
+            return self
 
         for actor in obj.get('cast'):
             name = actor.get('name')
             self._datastore.add_link(name, title)
 
+        return self
+
     def stash(self, filename=None):
         if not filename:
             filename = settings.STASH_FILENAME
+
         pickle.dump(self.datastore, open(filename, 'wb'))
+        return self
 
     def from_stash(self, filename=None):
         if not filename:
             filename = settings.STASH_FILENAME
 
         self.datastore = pickle.load(open(filename, 'rb'))
+        return self
 
 
 def load_directory(
@@ -87,6 +96,6 @@ def load_file(path, store_result=settings.STASH_IMPORTED, *args, **kwargs):
 
     return importer
 
-def load_stash(filename):
+def load_stash(filename=None):
     importer = Importer()
-    return importer.from_stash().datastore()
+    return importer.from_stash(filename).datastore

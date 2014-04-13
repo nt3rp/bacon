@@ -3,16 +3,16 @@ from bacon.utils import breadth_first_search, is_odd
 
 
 class FilmGraph(object):
-    def __init__(self, data=None):
+    def __init__(self):
         # Note that our 'database' could probably just be one dictionary.
         # However, since its possible that there are movies and actors
         # that share a name (e.g. "Ed Wood" <- A director, but you get
         # the idea), we break things up into 'actors' and 'films'.
-        if not data:
-            data = {
-                'films': {},
-                'actors': {}
-            }
+
+        data = {
+            'films': {},
+            'actors': {}
+        }
 
         self._datastore = data
 

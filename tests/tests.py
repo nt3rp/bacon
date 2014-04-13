@@ -40,7 +40,7 @@ class ImportTestCase(unittest.TestCase):
     def test_verify_data_single(self):
         instance = importer.load_file('tests/data/1.json')
 
-        actual = instance.datastore
+        actual = instance.datastore.to_dict()
         expected = {
             'films': {'Film 1': set(['Actor 1'])},
             'actors': {'Actor 1': set(['Film 1'])}
@@ -51,7 +51,7 @@ class ImportTestCase(unittest.TestCase):
         instance = importer.load_file('tests/data/1.json')
         instance.load_file('tests/data/2.json')
 
-        actual = instance.datastore
+        actual = instance.datastore.to_dict()
         expected = {
             'films': {
                 'Film 1': set(['Actor 1']),
@@ -67,7 +67,7 @@ class ImportTestCase(unittest.TestCase):
     def test_verify_duplicate_actor(self):
         instance = importer.load_file('tests/data/1.json')
 
-        actual = instance.datastore
+        actual = instance.datastore.to_dict()
         expected = {
             'films': {'Film 1': set(['Actor 1'])},
             'actors': {'Actor 1': set(['Film 1'])}
@@ -78,7 +78,7 @@ class ImportTestCase(unittest.TestCase):
         instance = importer.load_file('tests/data/1.json')
         instance.load_file('tests/data/1.json')
 
-        actual = instance.datastore
+        actual = instance.datastore.to_dict()
         expected = {
             'films': {'Film 1': set(['Actor 1'])},
             'actors': {'Actor 1': set(['Film 1'])}
