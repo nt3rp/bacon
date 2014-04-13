@@ -12,10 +12,11 @@ class ImportTestCase(unittest.TestCase):
     # Folder or file problems should not raise an exception
     def test_missing_folder(self):
         try:
-            importer.import_data(directory='bogus_folder')
+            importer.import_directory(directory='bogus_folder')
         except:
             self.fail('Should not throw an exception for missing folders.')
 
+    # Film missing title
     # File contents should match expected
 
 if __name__ == '__main__':

@@ -4,10 +4,11 @@ import pickle
 from bacon import settings
 
 
-def import_data(directory=None, *args, **kwargs):
-    if not directory:
-        directory = settings.IMPORT_DIRECTORY
-
+def import_directory(
+        directory=settings.IMPORT_DIRECTORY,
+        pickling=settings.PICKLING,
+        **kwargs
+    ):
     # Note that our 'database' could probably just be one dictionary.
     # However, since its possible that there are movies and actors
     # that share a name (e.g. "Ed Wood" <- A director, but you get
@@ -19,36 +20,44 @@ def import_data(directory=None, *args, **kwargs):
 
     try:
         files = os.listdir(directory)
-    except:
+    except:  # We don't particularly care what the exception is. Just handle it.
         print('There was a problem accessing "{}"'.format(directory))
         return
 
     # Iterate over all files in a folder
     for filename in files:
         full_path = os.path.join(directory, filename)
+        import_file(database, full_path)
 
-        with open(full_path) as f:
-            try:
-                contents = json.loads(f.read())
-            except ValueError:
-                continue
+    if pickling:
+        pickle.dump(database, open('db.p', 'wb'))
 
-        title = contents.get('film', {}).get('name')
-
-        if not title:
-            continue
-
-        if not database['films'].get(title):
-            database['films'][title] = set()
+    return database
 
 
-        for actor in contents.get('cast'):
-            name = actor.get('name')
+def import_file(database, full_path, *args, **kwargs):
+    with open(full_path) as f:
+        try:
+            contents = parse_file(database, f.read())
+        except ValueError:
+            return
 
-            if not database['actors'].get(name):
-                database['actors'][name] = set()
 
-            database['actors'][name].add(title)
-            database['films'][title].add(name)
+def parse_file(database, file):
+    obj = json.loads(file)
+    title = obj.get('film', {}).get('name')
 
-    pickle.dump(database, open('db.p', 'wb'))
+    if not title:
+        return
+
+    if not database['films'].get(title):
+        database['films'][title] = set()
+
+    for actor in obj.get('cast'):
+        name = actor.get('name')
+
+        if not database['actors'].get(name):
+            database['actors'][name] = set()
+
+        database['actors'][name].add(title)
+        database['films'][title].add(name)
