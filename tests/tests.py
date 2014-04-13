@@ -143,5 +143,25 @@ class FilmGraphTestCase(unittest.TestCase):
         actual = self.datastore.get_shortest_path('Bill Murray', 'Dan Aykroyd')
         self.assertListEqual(expected, actual)
 
+
+class StashTestCase(unittest.TestCase):
+    def setUp(self):
+        self.datastore = FilmGraph()
+
+    def tearDown(self):
+        pass
+
+    def test_stash_and_load(self):
+        instance = importer.load_file('tests/data/1.json')
+        instance.load_file('tests/data/2.json')
+
+        expected = instance.datastore.to_dict()
+
+        instance.stash('test.p')
+        instance.from_stash('test.p')
+
+        actual = instance.datastore.to_dict()
+        self.assertDictEqual(expected, actual)
+
 if __name__ == '__main__':
     unittest.main()

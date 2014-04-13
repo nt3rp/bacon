@@ -33,7 +33,7 @@ class Importer(object):
         # Iterate over all files in a folder
         for filename in files:
             path = os.path.join(directory, filename)
-            load_file(path)
+            self.load_file(path)
 
         return self
 
@@ -98,4 +98,4 @@ def load_file(path, store_result=settings.STASH_IMPORTED, *args, **kwargs):
 
 def load_stash(filename=None):
     importer = Importer()
-    return importer.from_stash(filename).datastore
+    return importer.from_stash(filename)

@@ -4,7 +4,8 @@ from bacon.importer import load_stash
 
 def find(actor, target_actor=settings.TARGET_ACTOR, datastore=None, **kwargs):
     if not datastore:
-        datastore = load_stash()
+        importer = load_stash()
+        datastore = importer.datastore
 
     path = datastore.get_shortest_path(actor, target_actor)
 
