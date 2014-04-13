@@ -1,5 +1,5 @@
 import pickle
-from bacon.utils import is_odd
+from bacon.utils import is_odd, breadth_first_search
 
 
 def find(actor, target_actor="Kevin Bacon", **kwargs):
@@ -19,25 +19,3 @@ def find(actor, target_actor="Kevin Bacon", **kwargs):
     print ' '.join(path)
 
 
-def breadth_first_search(database, actor, target_actor='Kevin Bacon'):
-    queue = list()
-    queue.append([actor])
-
-    count = 0
-    while queue:
-        # Equivalent to 'dequeue'
-        path = queue.pop(0)
-
-        node = path[-1]
-
-        if node == target_actor:
-            return path
-
-        key = 'films' if (is_odd(count)) else 'actors'
-
-        for adjacent in database[key].get(node, []):
-            new_path = list(path)
-            new_path.append(adjacent)
-            queue.append(new_path)
-
-        count += 1

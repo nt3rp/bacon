@@ -55,6 +55,7 @@ class Importer(object):
         # Store the results of our import
         pickle.dump(self.datastore, open(settings.STASH_FILENAME, 'wb'))
 
+    # class method?
     def from_stash(self):
         raise NotImplementedError
 
