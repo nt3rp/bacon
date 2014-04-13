@@ -1,12 +1,10 @@
 import os
 import json
 import pickle
-import sys
 from bacon import settings
-from bacon.utils import error
 
 
-def import_data(directory=None, out=sys.stdout, *args, **kwargs):
+def import_data(directory=None, *args, **kwargs):
     if not directory:
         directory = settings.IMPORT_DIRECTORY
 
@@ -19,14 +17,8 @@ def import_data(directory=None, out=sys.stdout, *args, **kwargs):
         'actors': {}
     }
 
-    try:
-        files = os.listdir(directory)
-    except OSError:
-        out.write(error('bad folder', directory=directory))
-        return
-
     # Iterate over all files in a folder
-    for filename in files:
+    for filename in os.listdir(directory):
         full_path = os.path.join(directory, filename)
 
         with open(full_path) as f:
