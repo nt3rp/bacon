@@ -1,7 +1,6 @@
 import argparse
 from bacon import importer, search
 
-
 def main():
     parser = argparse.ArgumentParser(
         description='Find the shortest path between actors.'
@@ -17,9 +16,17 @@ def main():
 
     # Sub-command for search data
     search_parser = subparsers.add_parser(
-        'find', help='Find link from actor to Kevin Bacon'
+        'search', help='Find how actors are connected.'
     )
-    search_parser.add_argument('actor', help='name of actor to start search from')
+    search_parser.add_argument(
+        'actor', help='Name of actor to start search from'
+    )
+    search_parser.add_argument(
+        'target_actor',
+        nargs='?',
+        default='Kevin Bacon',
+        help='Name of actor to find connection to.'
+    )
     search_parser.set_defaults(func=search.find)
 
     # Process Arguments
