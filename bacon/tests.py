@@ -8,6 +8,14 @@ class ImportTestCase(unittest.TestCase):
             'films': {},
             'actors': {}
         }
+        self.film1 = json.dumps({
+            'film': {'name': 'Film 1'},
+            'cast': [{'name': 'Actor 1'}]
+        })
+        self.film2 = json.dumps({
+            'film': {'name': 'Film 2'},
+            'cast': [{'name': 'Actor 1'}, {'name': 'Actor 2'}]
+        })
 
     def tearDown(self):
         pass
@@ -33,10 +41,7 @@ class ImportTestCase(unittest.TestCase):
             self.fail('Should not throw an exception for missing title.')
 
     def test_verify_data_single(self):
-        importer.parse_file(self.db, json.dumps({
-            'film': {'name': 'Film 1'},
-            'cast': [{'name': 'Actor 1'}]
-        }))
+        importer.parse_file(self.db, self.film1)
         actual = self.db
         expected = {
             'films': {'Film 1': set(['Actor 1'])},
@@ -45,14 +50,8 @@ class ImportTestCase(unittest.TestCase):
         self.assertDictEqual(expected, actual)
 
     def test_verify_data_multiple(self):
-        importer.parse_file(self.db, json.dumps({
-            'film': {'name': 'Film 1'},
-            'cast': [{'name': 'Actor 1'}]
-        }))
-        importer.parse_file(self.db, json.dumps({
-            'film': {'name': 'Film 2'},
-            'cast': [{'name': 'Actor 1'}, {'name': 'Actor 2'}]
-        }))
+        importer.parse_file(self.db, self.film1)
+        importer.parse_file(self.db, self.film2)
 
         actual = self.db
         expected = {

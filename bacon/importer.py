@@ -4,6 +4,7 @@ import pickle
 from bacon import settings
 
 # TODO: Describe expected format
+# TODO: Suppress output during tests
 
 def import_directory(
         directory=settings.IMPORT_DIRECTORY,
@@ -28,7 +29,7 @@ def import_directory(
     # Iterate over all files in a folder
     for filename in files:
         full_path = os.path.join(directory, filename)
-        import_file(database, full_path)
+        import_file(full_path, database)
 
     if pickling:
         pickle.dump(database, open('db.p', 'wb'))
@@ -36,7 +37,7 @@ def import_directory(
     return database
 
 
-def import_file(database, full_path, *args, **kwargs):
+def import_file(full_path, database, *args, **kwargs):
     with open(full_path) as f:
         parse_file(database, f.read())
 
@@ -45,6 +46,7 @@ def parse_file(database, file):
     try:
         obj = json.loads(file)
     except ValueError:
+        # Skip this file. We only handle JSON right now.
         return
 
     title = obj.get('film', {}).get('name')
