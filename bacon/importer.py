@@ -1,6 +1,7 @@
 import os
 import json
 from bacon import settings
+from bacon.models import FilmGraph
 
 # TODO: Describe expected format
 # TODO: Suppress output during tests
@@ -11,10 +12,11 @@ class Importer(object):
         # However, since its possible that there are movies and actors
         # that share a name (e.g. "Ed Wood" <- A director, but you get
         # the idea), we break things up into 'actors' and 'films'.
-        self.datastore = {
-            'films': {},
-            'actors': {}
-        }
+        self._datastore = FilmGraph()
+
+    @property
+    def datastore(self):
+        return self._datastore.to_dict()
 
     def load_directory(self, directory):
         try:
@@ -44,17 +46,9 @@ class Importer(object):
         if not title:
             return
 
-        if not self.datastore['films'].get(title):
-            self.datastore['films'][title] = set()
-
         for actor in obj.get('cast'):
             name = actor.get('name')
-
-            if not self.datastore['actors'].get(name):
-                self.datastore['actors'][name] = set()
-
-            self.datastore['actors'][name].add(title)
-            self.datastore['films'][title].add(name)
+            self._datastore.add_link(name, title)
 
 
 def load_directory(directory=settings.IMPORT_DIRECTORY, **kwargs):
