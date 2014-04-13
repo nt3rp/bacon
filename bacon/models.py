@@ -51,4 +51,4 @@ class FilmGraph(object):
     @staticmethod
     def neighbours(graph, node, level):
         key = 'films' if (is_odd(level)) else 'actors'
-        return graph.get(node, [])
+        return graph.get(key, {}).get(node, [])

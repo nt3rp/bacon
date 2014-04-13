@@ -10,7 +10,6 @@ def breadth_first_search(graph, start, finish, neighbour_fn=neighbours):
     queue = list()
     queue.append([start])
 
-    level = 0
     while queue:
         # Equivalent to 'dequeue'
         path = queue.pop(0)
@@ -20,13 +19,12 @@ def breadth_first_search(graph, start, finish, neighbour_fn=neighbours):
         if node == finish:
             return path
 
-        neighbours = neighbour_fn(graph, node, level)
+        neighbours = neighbour_fn(graph, node, len(path)-1)
 
         for neighbour in neighbours:
-            new_path = list(path)
-            new_path.append(neighbour)
-            queue.append(new_path)
-
-        level += 1
+            if neighbour not in path:
+                new_path = list(path)
+                new_path.append(neighbour)
+                queue.append(new_path)
 
     return []

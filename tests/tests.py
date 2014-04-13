@@ -116,7 +116,7 @@ class FilmGraphTestCase(unittest.TestCase):
 
     def test_no_films_in_common(self):
         self.datastore.add_link('Superman', 'The Adventures of Lois and Clark')
-        self.datastore.add_link('Clark Kent', 'Superman')
+        self.datastore.add_link('Clark Kent', 'Superman 2')
 
         expected = []
         actual = self.datastore.get_shortest_path('Clark Kent', 'Superman')
@@ -131,7 +131,17 @@ class FilmGraphTestCase(unittest.TestCase):
         )
         self.assertListEqual(expected, actual)
 
-    # Verify shortest path
+    def test_start_is_finish(self):
+        self.datastore.add_link('Bill Murray', 'Ghostbusters')
+        self.datastore.add_link('Bill Murray', 'SNL')
+        self.datastore.add_link('John Belushi', 'SNL')
+        self.datastore.add_link('John Belushi', 'Blues Brothers')
+        self.datastore.add_link('Dan Aykroyd', 'Ghostbusters')
+        self.datastore.add_link('Dan Aykroyd', 'Blues Brothers')
+
+        expected = ['Bill Murray', 'Ghostbusters', 'Dan Aykroyd']
+        actual = self.datastore.get_shortest_path('Bill Murray', 'Dan Aykroyd')
+        self.assertListEqual(expected, actual)
 
 if __name__ == '__main__':
     unittest.main()
