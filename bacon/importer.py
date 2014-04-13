@@ -37,7 +37,7 @@ def import_directory(
 
 def import_file(database, full_path, *args, **kwargs):
     with open(full_path) as f:
-        contents = parse_file(database, f.read())
+        parse_file(database, f.read())
 
 
 def parse_file(database, file):

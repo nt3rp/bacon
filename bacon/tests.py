@@ -1,3 +1,4 @@
+import json
 import unittest
 from bacon import importer
 
@@ -26,8 +27,11 @@ class ImportTestCase(unittest.TestCase):
         except:
             self.fail('Should not throw an exception for non-json file.')
 
-    # def test_film_title_missing(self):
-    #     importer.import_file()
+    def test_film_title_missing(self):
+        try:
+            importer.parse_file(self.db, json.dumps({'film': {}}))
+        except:
+            self.fail('Should not throw an exception for missing title.')
 
     # Film missing title
     # File contents should match expected
