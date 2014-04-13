@@ -1,12 +1,15 @@
 import os
 import json
+import pickle
 from bacon import Session
-from bacon.models import Film, get_or_create, Actor
 
 DIRECTORY = 'films'
 
 def import_data(*args, **kwargs):
-    session = Session()
+    database = {
+        'films': {},
+        'actors': {}
+    }
 
     # Iterate over all files in a folder
     for filename in os.listdir(DIRECTORY):
@@ -24,18 +27,17 @@ def import_data(*args, **kwargs):
         if not title:
             continue
 
-        film = Film(name=title)
+        if not database['films'].get(title):
+            database['films'][title] = set()
 
-        actors = []
-        for cast_member in contents.get('cast'):
-            name = cast_member.get('name')
 
-            actor = Actor(name=name)
-            actors.append(actor)
+        for actor in contents.get('cast'):
+            name = actor.get('name')
 
-        session.add_all(actors)
+            if not database['actors'].get(name):
+                database['actors'][name] = set()
 
-        film.actors = actors;
-        session.add(film)
+            database['actors'][name].add(title)
+            database['films'][title].add(name)
 
-    session.commit()
+    pickle.dump(database, open('db.p', 'wb'))

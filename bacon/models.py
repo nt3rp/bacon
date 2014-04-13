@@ -1,3 +1,5 @@
+import pickle
+from collections import namedtuple
 from sqlalchemy import Column, Integer, String, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import ClauseElement
@@ -5,39 +7,6 @@ from sqlalchemy.sql import ClauseElement
 # Our relations table
 from bacon import Base, Session
 
-film_relations = Table('film_relations', Base.metadata,
-    Column('film_id', Integer, ForeignKey('films.id')),
-    Column('actor_id', Integer, ForeignKey('actors.id'))
-)
-
-class Actor(Base):
-    __tablename__ = 'actors'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-
-    def __repr__(self):
-        return "<Actor(name='{}')>".format(self.name)
-
-    # Basically, just an alias to make our breadth-first search more generic
-    def relations(self):
-        return self.films
-
-
-class Film(Base):
-    __tablename__ = 'films'
-
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-
-    actors = relationship('Actor', secondary=film_relations, backref='films')
-
-    def __repr__(self):
-        return "<Film(name='{}')>".format(self.name)
-
-    # Basically, just an alias to make our breadth-first search more generic
-    def relations(self):
-        return self.actors
 
 # TODO: Pass in 'echo' options somehow
 # TODO: Check if DB exists before creating
@@ -45,38 +14,49 @@ def create_database(db, *args, **kwargs):
     Base.metadata.create_all(db)
 
 def find(actor_name, target_name="Kevin Bacon", **kwargs):
-    session = Session()
+    database = pickle.load(open('db.p', 'rb'))
 
     # Basically, do a breadth-first search
 
-    # Find actor
-    actor = session.query(Actor).filter(Actor.name == actor_name).first()
+    # Check if actor exists
+    actor = database['actors'].get(actor_name)
+    if not actor:
+        pass
 
     # TODO: If not actor...
-    path = breadth_first_search(actor)
+    path = breadth_first_search(database, actor_name)
 
     for index, item in enumerate(path):
         if (index % 2) == 1:
-            path[index] = '-({})->'.format(item.name)
+            path[index] = '-({})->'.format(item)
         else:
-            path[index] = '{}'.format(item.name)
+            path[index] = '{}'.format(item)
 
     print ' '.join(path)
 
-def breadth_first_search(actor, target_name='Kevin Bacon'):
+def breadth_first_search(database, actor, target_actor='Kevin Bacon'):
     queue = []
     queue.append([actor])
 
+    # Need to alternate between search actors, and searching movies
+    count = 0
     while queue:
         # Equivalent to 'dequeue'
         path = queue.pop(0)
 
         node = path[-1]
 
-        if node.name == target_name:
+        if node == target_actor:
             return path
 
-        for adjacent in node.relations():
+        if count % 2 == 0:
+            relations = database['actors'].get(node, [])
+        else:
+            relations = database['films'].get(node, [])
+
+        for adjacent in relations:
             new_path = list(path)
             new_path.append(adjacent)
             queue.append(new_path)
+
+        count += 1
