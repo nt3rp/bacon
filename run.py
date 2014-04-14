@@ -1,3 +1,4 @@
+from StringIO import StringIO
 import argparse
 from bacon import importer, search, settings
 

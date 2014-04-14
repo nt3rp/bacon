@@ -1,4 +1,8 @@
 import unittest
+from StringIO import StringIO
+from bacon import settings
+settings.OUTPUT = StringIO()
+
 from bacon import importer
 from bacon.models import FilmGraph
 
@@ -10,14 +14,12 @@ class ImportTestCase(unittest.TestCase):
     def tearDown(self):
         pass
 
-    # TODO: provide more meaningful error message
     def test_incorrect_permissions(self):
         try:
             importer.load_directory(directory='tests/wrong_permissions')
         except:
-            self.fail('Should not throw an exception for missing folders.')
+            self.fail('Should not throw an exception for wrong permissions.')
 
-    # TODO: provide more meaningful error message
     def test_missing_folder(self):
         try:
             importer.load_directory('test/missing_folder')

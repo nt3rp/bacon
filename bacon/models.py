@@ -1,3 +1,4 @@
+import sys
 from bacon import settings
 from bacon.utils import breadth_first_search, is_odd
 

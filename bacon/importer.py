@@ -1,20 +1,20 @@
 import os
 import json
 import pickle
+import sys
 from bacon import settings
 from bacon.models import FilmGraph
 
-# TODO: Describe expected format
-# TODO: Suppress output during tests
 
 class Importer(object):
     """Handles the importing of film data (actors and film titles)."""
-    def __init__(self):
+    def __init__(self, out=sys.stdout):
         # Note that our 'database' could probably just be one dictionary.
         # However, since its possible that there are movies and actors
         # that share a name (e.g. "Ed Wood" <- A director, but you get
         # the idea), we break things up into 'actors' and 'films'.
         self._datastore = FilmGraph()
+        self.out = out
 
     @property
     def datastore(self):
@@ -26,12 +26,17 @@ class Importer(object):
 
     def load_directory(self, directory):
         """Load film files (assumed to be JSON) from `directory`"""
+        self.out.write('Attempting to load files from "{}"... '.format(directory))
+
         try:
             files = os.listdir(directory)
+            self.out.write('Success!\n')
         except:
             # We don't particularly care what the exception is. Just handle it.
-            print('There was a problem accessing "{}"'.format(directory))
-            return
+            self.out.write(
+                'There was a problem accessing "{}"\n'.format(directory)
+            )
+            return self
 
         # Iterate over all files in a folder
         for filename in files:
@@ -42,28 +47,32 @@ class Importer(object):
 
     def load_file(self, path):
         """Load film a film files (assumed to be JSON) from `path`"""
+        self.out.write('\tLoading "{}"... '.format(path))
         with open(path) as f:
             self.parse_file(f.read())
 
         return self
 
     def parse_file(self, file_contents):
-        """Parse the contents of a film file (assumed to be JSON) into our format."""
+        """Parse contents of film file (assumed to be JSON) into our format."""
         try:
             obj = json.loads(file_contents)
         except ValueError:
             # Skip this file. We only handle JSON right now.
+            self.out.write('Skipping (Unsupported format)\n')
             return self
 
         title = obj.get('film', {}).get('name')
 
         if not title:
+            self.out.write('Skipping (Missing title).\n')
             return self
 
         for actor in obj.get('cast'):
             name = actor.get('name')
             self._datastore.add_link(name, title)
 
+        self.out.write('Success!\n')
         return self
 
     def stash(self, filename=None):
@@ -86,23 +95,26 @@ class Importer(object):
 def load_directory(
         directory=settings.IMPORT_DIRECTORY,
         store_result=settings.STASH_IMPORTED,
+        out=settings.OUTPUT,
         **kwargs
     ):
-    importer = Importer()
+    importer = Importer(out=out)
     importer.load_directory(directory)
     if store_result:
         importer.stash()
 
     return importer
 
-def load_file(path, store_result=settings.STASH_IMPORTED, *args, **kwargs):
-    importer = Importer()
+def load_file(
+        path, store_result=settings.STASH_IMPORTED, out=settings.OUTPUT,*args, **kwargs
+    ):
+    importer = Importer(out=out)
     importer.load_file(path)
     if store_result:
         importer.stash()
 
     return importer
 
-def load_stash(filename=None):
-    importer = Importer()
+def load_stash(filename=None, out=settings.OUTPUT):
+    importer = Importer(out=out)
     return importer.from_stash(filename)
