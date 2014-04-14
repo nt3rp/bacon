@@ -17,7 +17,7 @@ though it is by no means necessary.
 Tests are implemented using Python's built-in
 [`unittest` library](https://docs.python.org/2/library/unittest.html), and
 code coverage metrics are obtained using the
-[`coverage` library](http://nedbatchelder.com/code/coverage/)
+[`coverage` library](http://nedbatchelder.com/code/coverage/).
 
 ### Unit Tests
 
